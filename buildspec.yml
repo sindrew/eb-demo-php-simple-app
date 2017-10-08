@@ -14,11 +14,11 @@ phases:
       - curl -sS https://getcomposer.org/installer | php
       - mv composer.phar /usr/bin/composer
       - rm -rf /var/www/*
-      - ADD . /var/www
+      - cp -pr . /var/www
       - cd /var/www && /usr/bin/composer install
       - a2enmod rewrite
       - chown -R www-data:www-data /var/www
-      - ADD apache.conf /etc/apache2/sites-available/default
+      - cp apache.conf /etc/apache2/sites-available/default
       - EXPOSE 80
       - CMD ["/usr/sbin/apache2", "-D",  "FOREGROUND"]
   pre_build:
