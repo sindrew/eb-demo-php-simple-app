@@ -1,36 +1,21 @@
 version: 0.2
 
-env:
-  variables:
-    APACHE_RUN_USER: "www-data"
-    APACHE_RUN_GROUP: "www-data"
-    APACHE_LOG_DIR: "/var/log/apache2"
 phases:
-  install:
-    commands:
-      - echo "$(lsb_release -cs)"
-      - apt-get update -y
-      - apt-get install -y git curl apache2 php5 libapache2-mod-php5 php5-mcrypt php5-mysql
-      - curl -sS https://getcomposer.org/installer | php
-      - mv composer.phar /usr/bin/composer
-      - rm -rf /var/www/*
-      - cp -pr . /var/www
-      - cd /var/www && /usr/bin/composer install
-      - a2enmod rewrite
-      - chown -R www-data:www-data /var/www
-      - cp apache.conf /etc/apache2/sites-available/default
-      - CMD [EXPOSE 80]
-      - CMD ["/usr/sbin/apache2", "-D",  "FOREGROUND"]
   pre_build:
     commands:
+      - echo Logging in to Amazon ECR...
       - $(aws ecr get-login --no-include-email --region ca-central-1)
   build:
     commands:
-      - sbt test
-      - sbt docker:publish
+      - echo Build started on `date`
+      - echo Building the Docker image...          
+      - docker build -t apexdev-ecr .
+      - docker tag apexdev-ecr:latest 266046603710.dkr.ecr.ca-central-1.amazonaws.com/apexdev-ecr:latest
   post_build:
     commands:
       - echo Build completed on `date`
+      - echo Pushing the Docker image...
+      - docker push 266046603710.dkr.ecr.ca-central-1.amazonaws.com/apexdev-ecr:latest         
 artifacts:
   files:
     - Dockerrun.aws.json
