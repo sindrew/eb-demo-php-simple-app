@@ -19,7 +19,7 @@ phases:
       - a2enmod rewrite
       - chown -R www-data:www-data /var/www
       - cp apache.conf /etc/apache2/sites-available/default
-      - EXPOSE 80
+      - CMD [EXPOSE 80]
       - CMD ["/usr/sbin/apache2", "-D",  "FOREGROUND"]
   pre_build:
     commands:
